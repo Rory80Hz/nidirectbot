@@ -31,25 +31,22 @@ server.post('/api/messages', connector.listen());
 // Create your bot with a function to receive messages from the user
 var bot = new builder.UniversalBot(connector);
 
-// Make sure you add code to validate these fields
-var luisAppId = process.env.LuisAppId || 'f3e8edb3-ec43-44d8-a785-a45c73af2051';
-var luisAPIKey = process.env.LuisAPIKey || 'e393b8c6e2eb4d7fbbf35ceaebea495c';
-var luisAPIHostName = 'westus.api.cognitive.microsoft.com';
-
-const LuisModelUrl =
-  'https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/f3e8edb3-ec43-44d8-a785-a45c73af2051?subscription-key=e393b8c6e2eb4d7fbbf35ceaebea495c&timezoneOffset=0&verbose=true&q=';
-
 var bot = new builder.UniversalBot(connector, function(session) {
   session.send(
-    'Sorry, I did not understand \'%s\'. Type \'help\' if you need assistance.',
+    'No idea what you are talking about. \'%s \'%s\'. Type \'help\' if you need assistance.',
     session.message.text);
 });
 
-bot.dialog('flights', require('./dialogs/flights')).triggerAction({
-  matches: 'Techradar.add'
+var recognizer = new builder.LuisRecognizer(
+  'https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/f3e8edb3-ec43-44d8-a785-a45c73af2051?subscription-key=e393b8c6e2eb4d7fbbf35ceaebea495c&timezoneOffset=0&verbose=true&q='
+);
+bot.recognizer(recognizer);
+
+bot.dialog('TechradarAdd', require('./dialogs/radar/add')).triggerAction({
+  matches: 'Techradar.Add'
 });
-bot.dialog('hotels', require('./dialogs/hotels')).triggerAction({
-  matches: 'Techradar.add'
+bot.dialog('TechradarWho', require('./dialogs/radar/who')).triggerAction({
+  matches: 'Techradar.Who'
 });
 bot.dialog('help', require('./support')).triggerAction({
   matches: 'Help'
